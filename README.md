@@ -2,10 +2,16 @@
 
 Show it when it matters — safe conditional visibility without eval.
 
-Zero-dependency vanilla JS: show/hide DOM elements based on form field values. Markup only. Conditions run through a hand-written parser — no `eval`, no `new Function`.
+Zero-dependency vanilla JS: show/hide DOM elements based on form field values. Conditions are written in markup attributes, not JS. Conditions run through a hand-written parser — no `eval`, no `new Function`.
+
+## Quick Start
+
+```bash
+npm install github:ernilambar/showmo
+```
 
 ```html
-<script src="./dist/showmo.min.js" defer></script>
+<link rel="stylesheet" href="./node_modules/showmo/dist/showmo.css" />
 
 <select id="country">
   <option value="US">US</option>
@@ -19,7 +25,22 @@ Zero-dependency vanilla JS: show/hide DOM elements based on form field values. M
 </div>
 ```
 
-No JavaScript needed — the script auto-initializes on `[data-showmo]`.
+```js
+import { initAll } from 'showmo';
+import 'showmo/showmo.css';
+
+initAll();
+```
+
+`initAll()` wires up every `[data-showmo]` / `[data-showmo-rules]` element on the page. See [Install](#install) for build/distribution details.
+
+## Install
+
+`dist/showmo.esm.js` for bundlers, `dist/showmo.css` for base styling and animation presets. Load the CSS — without it, `[data-showmo]` elements flash visible before JS runs. Zero dependencies.
+
+`dist/` is not committed to the repo — `npm install` builds it automatically. If you cloned the repo or downloaded it as a ZIP instead, run `npm install` (or `npm run build`) yourself first to generate `dist/`.
+
+A pre-bundled `dist/showmo.min.js` for plain `<script>` tag usage (no bundler, no import) is also built, but this is an early-stage convenience and may change or be dropped in a future version — don't build long-term dependencies on it yet.
 
 ## Syntax
 
@@ -50,30 +71,17 @@ Full expressions also support `=== !== == != > < >= <=`. Anything else (method c
 
 Precedence: per-element attrs > JS call options > `window.showmoConfig` > defaults.
 
-## No flicker on load
-
-Visibility is applied by JS, so conditional elements can flash visible before the first evaluation. Load `showmo.css` in `<head>` — it pre-hides `[data-showmo]` / `[data-showmo-rules]` elements until the first run sets their state and reveals the matches (instantly — the first run never animates):
+## Animation
 
 ```html
-<head>
-  <link rel="stylesheet" href="./dist/showmo.css" />
-  <noscript><style>[data-showmo],[data-showmo-rules]{display:revert !important}</style></noscript>
-</head>
+<link rel="stylesheet" href="./dist/showmo.css" />
+<div data-showmo="#country:NP" data-showmo-animate="fade">Fades in/out.</div>
+<div data-showmo="#country:NP" data-showmo-animate="slide" style="--showmo-duration:.25s">
+  <div class="showmo-inner">Slides open; needs this one inner wrapper.</div>
+</div>
 ```
 
-Prefer not to ship the whole file? Inline just the guard:
-
-```html
-<style>[data-showmo]:not([data-showmo-state]),[data-showmo-rules]:not([data-showmo-target]):not([data-showmo-state]){display:none}</style>
-```
-
-Two cases the guard doesn't cover — handle them by pre-hiding with `hidden` (removed automatically on show):
-
-- JS-API targets with no `data-showmo` attributes: `<div id="extra" hidden>…</div>`
-- Rule holders pointing elsewhere (`data-showmo-target`): pre-hide the *target*, not the holder.
-- Custom `attr` names (e.g. `data-condition`): same `hidden` approach.
-
-With `onload: false`, elements stay pre-hidden until you call `refresh()`.
+Duration via `--showmo-duration` (default `.2s`); reduced-motion collapses to instant; first run never animates.
 
 ## JS API
 
@@ -93,21 +101,9 @@ showmoRules(
 );
 ```
 
-`ifTrue`/`ifFalse` accept action names (`show hide enable disable clear ignore`), functions, or arrays. `when` entries are ANDed; hidden sources cascade; chains settle via fixpoint. Both APIs return `{ refresh(), destroy() }` — call `refresh()` for dynamically added markup.
+`ifTrue`/`ifFalse` accept action names (`show hide enable disable clear ignore`), functions, or arrays. `when` entries are ANDed; hidden sources cascade; chains settle via fixpoint. Both APIs return `{ refresh(), destroy() }` — call `refresh()` for dynamically added markup, `destroy()` to stop listening and restore every managed element to its pre-showmo state (visibility, `disabled`, `required`, classes).
 
 JSON rules also work inline: `<tr data-showmo-rules='[{"source":"#country","is":"NP"}]'>` (own target; `data-showmo-target="#other"` points elsewhere).
-
-## Animation
-
-```html
-<link rel="stylesheet" href="./dist/showmo.css" />
-<div data-showmo="#country:NP" data-showmo-animate="fade">Fades in/out.</div>
-<div data-showmo="#country:NP" data-showmo-animate="slide" style="--showmo-duration:.25s">
-  <div class="showmo-inner">Slides open; needs this one inner wrapper.</div>
-</div>
-```
-
-Duration via `--showmo-duration` (default `.2s`); reduced-motion collapses to instant; first run never animates.
 
 ## Widget refresh
 
@@ -120,10 +116,10 @@ document.addEventListener('showmo:show', (e) =>
 
 State changes dispatch bubbling `showmo:show` / `showmo:hide` (`detail: { target, firstRun }`), plus one-time `showmo:init`. Transitions only, never spam.
 
-## Install
+## Security
 
-```bash
-npm install showmo
-```
+`data-showmo-onshow`/`data-showmo-onhide` (and the `onShow`/`onHide` options, when passed as strings) resolve a dotted path against `globalThis` and call whatever function they find — the same trust model as an inline `onclick`. Never populate these from untrusted or user-generated input.
 
-`dist/showmo.esm.js` for bundlers, `dist/showmo.min.js` as a plain script tag, `dist/showmo.css` for presets only. Zero dependencies.
+## License
+
+[MIT](https://opensource.org/licenses/MIT)

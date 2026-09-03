@@ -1,7 +1,7 @@
 import { getValue, resolveElements } from './values.js'
 import { testCondition } from './parse.js'
 import { matchWhen } from './rules.js'
-import { isPreset, applyVisibility, emitInit, emitTransition } from './effects.js'
+import { isPreset, applyVisibility, resetElement, emitInit, emitTransition } from './effects.js'
 
 const DEFAULTS = {
   attr: 'data-showmo',
@@ -243,6 +243,7 @@ function createController (items, base, cascade, rescan) {
       st.destroyed = true
       for (const item of items) {
         if (item.el.hasAttribute(INIT)) item.el.removeAttribute(INIT)
+        if (!item.first) resetElement(item.el, item.opts)
       }
       if (doc) {
         doc.removeEventListener('change', onEvent)
@@ -294,7 +295,7 @@ export function showmoRules (rules, options) {
   return createController(items, base, true, rescan)
 }
 
-export function autoInit () {
+export function initAll () {
   const els = query('[data-showmo]:not([' + INIT + '])')
   if (els.length) showmo(els, {})
   const rules = []
