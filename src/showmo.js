@@ -158,10 +158,18 @@ function ruleItems (rules, base) {
   for (const rule of rules) {
     if (!rule) continue
     const list = toElements(rule.target)
-    const entries = Array.isArray(rule.when) ? rule.when : []
+    const when = rule.when
+    let entries
+    if (typeof when === 'string') entries = [{ expr: when }]
+    else if (Array.isArray(when)) entries = when
+    else if (when && typeof when === 'object') entries = [when]
+    else entries = []
     for (const el of list) {
       items.push(makeItem(el, function (get) {
-        return entries.every(function (e) { return matchWhen(e, get) })
+        return entries.every(function (e) {
+          if (e && e.expr !== undefined) return testCondition(e.expr, get)
+          return matchWhen(e, get)
+        })
       }, base))
     }
   }

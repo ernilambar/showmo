@@ -35,6 +35,26 @@ describe('json-rules', () => {
     c.destroy()
   })
 
+  it('string when expression supports OR and relations', () => {
+    el(`<input type="text" id="country" value="NP">
+      <input type="text" id="age" value="21">
+      <div id="a"></div>`)
+    const c = showmoRules([
+      { target: '#a', when: '#country:US || (#age >= 18 && #country:NP)' }
+    ])
+    expect(document.getElementById('a').getAttribute('data-showmo-state')).toBe('shown')
+    c.destroy()
+  })
+
+  it('object when entry with expr is evaluated', () => {
+    el('<input type="text" id="country" value="US"><div id="a"></div>')
+    const c = showmoRules([
+      { target: '#a', when: { expr: '#country:US' } }
+    ])
+    expect(document.getElementById('a').getAttribute('data-showmo-state')).toBe('shown')
+    c.destroy()
+  })
+
   it('unknown op falls back to ===', () => {
     el('<input type="text" id="country" value="NP"><div id="a"></div>')
     const c = showmoRules([{ target: '#a', when: [{ source: '#country', op: 'wat', value: 'NP' }] }])
