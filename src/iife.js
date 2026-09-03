@@ -1,5 +1,5 @@
 import './showmo.css'
-import { showmo, showmoRules, autoInit } from './showmo.js'
+import { showmo, showmoRules, initAll } from './showmo.js'
 import { getValue } from './values.js'
 
 function ready (fn) {
@@ -10,6 +10,6 @@ function ready (fn) {
   }
 }
 
-ready(autoInit)
+ready(initAll)
 
-globalThis.showmo = { showmo, showmoRules, autoInit, getValue }
+globalThis.showmo = { showmo, showmoRules, initAll, getValue }

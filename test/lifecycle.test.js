@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { autoInit, showmo } from '../src/index.js'
+import { initAll, showmo } from '../src/index.js'
 import { el } from './helpers.js'
 
 describe('lifecycle', () => {
   it('auto-init picks up [data-showmo] without an API call', () => {
     el(`<input type="text" id="c" value="NP">
       <div id="t" data-showmo="#c:NP">hi</div>`)
-    autoInit()
+    initAll()
     expect(document.getElementById('t').getAttribute('data-showmo-state')).toBe('shown')
     document.getElementById('t').removeAttribute('data-showmo-init')
   })
@@ -62,7 +62,23 @@ describe('lifecycle', () => {
     c.destroy()
     document.getElementById('c').value = 'US'
     document.getElementById('c').dispatchEvent(new Event('change', { bubbles: true }))
-    expect(document.getElementById('t').getAttribute('data-showmo-state')).toBe('shown')
+    expect(document.getElementById('t').getAttribute('data-showmo-state')).toBe(null)
+  })
+
+  it('destroy() restores elements to their original state', () => {
+    el('<input type="text" id="c" value="US"><div id="t" data-showmo="#c:NP" data-showmo-disable="true" data-showmo-require="true"><input id="f" required></div>')
+    const c = showmo('#t')
+    const t = document.getElementById('t')
+    const f = document.getElementById('f')
+    expect(t.getAttribute('data-showmo-state')).toBe('hidden')
+    expect(f.disabled).toBe(true)
+    expect(f.required).toBe(false)
+    c.destroy()
+    expect(t.getAttribute('data-showmo-state')).toBe(null)
+    expect(t.getAttribute('aria-hidden')).toBe(null)
+    expect(t.style.display).toBe('')
+    expect(f.disabled).toBe(false)
+    expect(f.required).toBe(true)
   })
 
   it('option precedence: attrs > call > window.showmoConfig > defaults', () => {

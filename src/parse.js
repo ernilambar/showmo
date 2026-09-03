@@ -192,17 +192,3 @@ export function testCondition (input, get) {
     return false
   }
 }
-
-export function conditionSources (input) {
-  try {
-    if (!input || !String(input).trim()) return []
-    const tk = tokenize(String(input))
-    const out = []
-    for (let i = 0; i < tk.length; i += 2) {
-      if (tk[i] === 0 && !out.includes(tk[i + 1])) out.push(tk[i + 1])
-    }
-    return out
-  } catch (err) {
-    return []
-  }
-}

@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite'
+import browserslistToEsbuild from 'browserslist-to-esbuild'
 
 export default defineConfig({
   build: {
+    target: browserslistToEsbuild(),
     emptyOutDir: false,
     minify: 'oxc',
     assetsInlineLimit: 0,

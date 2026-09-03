@@ -167,6 +167,30 @@ function runActions (actions, el) {
   }
 }
 
+export function resetElement (el, opts) {
+  const stored = el.getAttribute('data-showmo-display')
+  if (stored !== null) {
+    if (el.style) {
+      if (stored) el.style.display = stored
+      else el.style.removeProperty('display')
+    }
+    el.removeAttribute('data-showmo-display')
+  }
+  el.removeAttribute('aria-hidden')
+  el.removeAttribute(STATE)
+  if (el.classList) {
+    el.classList.remove(HIDDEN_CLS, NO_MOTION, 'showmo-fade', 'showmo-slide', 'showmo-pop')
+    if (opts && opts.hiddenClass) el.classList.remove(opts.hiddenClass)
+  }
+  BUILTINS.enable(el)
+  for (const c of collect(el, FIELDS, FIELDS)) {
+    if (c.getAttribute('data-showmo-required') !== null) {
+      c.required = c.getAttribute('data-showmo-required') === 'true'
+      c.removeAttribute('data-showmo-required')
+    }
+  }
+}
+
 export function applyVisibility (el, visible, opts, firstRun) {
   if (useAnimate(opts)) {
     if (el.classList) {
