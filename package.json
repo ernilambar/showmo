@@ -1,0 +1,45 @@
+{
+  "name": "showmo",
+  "version": "1.0.0",
+  "description": "Show it when it matters — safe conditional visibility without eval.",
+  "type": "module",
+  "main": "dist/showmo.esm.js",
+  "module": "dist/showmo.esm.js",
+  "unpkg": "dist/showmo.min.js",
+  "jsdelivr": "dist/showmo.min.js",
+  "exports": {
+    ".": {
+      "import": "./dist/showmo.esm.js",
+      "default": "./dist/showmo.esm.js"
+    },
+    "./showmo.css": "./dist/showmo.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "vite build && vite build --config vite.iife.config.js && cp src/showmo.css dist/showmo.css",
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "test": "vitest run"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "standard": {
+    "envs": ["browser"],
+    "globals": ["afterEach", "beforeEach", "describe", "expect", "it"]
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "jsdom": "^30.0.1",
+    "standard": "^17.1.2",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}

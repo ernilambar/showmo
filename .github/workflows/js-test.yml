@@ -1,0 +1,46 @@
+name: js-test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/js-test.yml'
+      - 'src/**'
+      - 'test/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+      - 'vitest.config.*'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/js-test.yml'
+      - 'src/**'
+      - 'test/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.*'
+      - 'vitest.config.*'
+
+concurrency:
+  group: js-test-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Fail on eval/new Function in dist
+        run: |
+          if grep -rE 'eval\(|new Function' dist/; then
+            echo 'eval/new Function found in dist/'
+            exit 1
+          fi
