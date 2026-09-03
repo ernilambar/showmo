@@ -1,0 +1,90 @@
+:root {
+  --showmo-duration: .2s;
+}
+
+.showmo-hidden:not(.showmo-fade):not(.showmo-slide):not(.showmo-pop) {
+  display: none !important;
+}
+
+.showmo-no-motion,
+.showmo-no-motion * {
+  transition: none !important;
+  animation: none !important;
+}
+
+.showmo-fade {
+  transition: opacity var(--showmo-duration) ease, visibility var(--showmo-duration) ease;
+}
+
+.showmo-fade[data-showmo-state="hidden"] {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.showmo-fade[data-showmo-state="shown"] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.showmo-slide {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows var(--showmo-duration) ease, opacity var(--showmo-duration) ease, visibility var(--showmo-duration) ease;
+}
+
+.showmo-slide > .showmo-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.showmo-slide[data-showmo-state="hidden"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.showmo-slide[data-showmo-state="shown"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+}
+
+.showmo-pop {
+  transition: transform var(--showmo-duration) ease, opacity var(--showmo-duration) ease, visibility var(--showmo-duration) ease;
+  transform-origin: center;
+}
+
+.showmo-pop[data-showmo-state="hidden"] {
+  transform: scale(.96);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.showmo-pop[data-showmo-state="shown"] {
+  transform: scale(1);
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .showmo-fade,
+  .showmo-slide,
+  .showmo-pop {
+    transition: none;
+  }
+
+  .showmo-fade[data-showmo-state="hidden"],
+  .showmo-pop[data-showmo-state="hidden"] {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .showmo-slide[data-showmo-state="hidden"] {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+  }
+}

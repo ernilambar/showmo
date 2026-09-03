@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>showmo — JSON rules inline</title>
+  <script src="../dist/showmo.min.js" defer></script>
+</head>
+<body>
+  <label>Country
+    <select id="country">
+      <option value="US">US</option>
+      <option value="NP">Nepal</option>
+      <option value="IN">India</option>
+    </select>
+  </label>
+
+  <table>
+    <tr data-showmo-rules='[{"source":"#country","is":"NP"}]' data-showmo-disable="true">
+      <td>City row: hidden + disabled unless country is NP.</td>
+    </tr>
+  </table>
+
+  <div data-showmo-rules='[{"source":"#country","oneOf":["NP","IN"]}]' data-showmo-target="#note">
+    Shown for Nepal or India.
+  </div>
+  <div id="note">Shipping note.</div>
+</body>
+</html>

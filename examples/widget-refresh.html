@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>showmo — widget refresh on reveal</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.18/mode/css/css.min.js"></script>
+  <script src="../dist/showmo.min.js" defer></script>
+  <script>
+    window.myApp = {
+      refreshEditors: function (target) {
+        target.querySelectorAll('.CodeMirror').forEach(function (el) {
+          if (el.CodeMirror) el.CodeMirror.refresh()
+        })
+      }
+    }
+    document.addEventListener('showmo:show', function (e) {
+      window.myApp.refreshEditors(e.detail.target)
+    })
+    window.addEventListener('DOMContentLoaded', function () {
+      // Initialized while hidden on purpose: without the
+      // showmo:show refresh above, the editor would render collapsed.
+      window.myEditor = window.CodeMirror.fromTextArea(
+        document.getElementById('css-editor'),
+        { mode: 'css', lineNumbers: true }
+      )
+    })
+  </script>
+</head>
+<body>
+  <label><input type="checkbox" id="enable-css" value="yes" /> Enable CSS editor</label>
+
+  <div data-showmo="#enable-css" data-showmo-onshow="myApp.refreshEditors">
+    <textarea id="css-editor" class="code-editor">body { color: rebeccapurple; }</textarea>
+  </div>
+</body>
+</html>

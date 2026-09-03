@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>showmo — JS API</title>
+  <script src="../dist/showmo.min.js" defer></script>
+</head>
+<body>
+  <label>Country
+    <select id="country">
+      <option value="US">US</option>
+      <option value="NP">Nepal</option>
+	  <option value="IN">India</option>
+    </select>
+  </label>
+  <label><input type="checkbox" id="express" value="yes" /> Express</label>
+
+  <div id="extra">Simple: no markup expression needed.</div>
+
+  <div class="conditional" data-condition='#country === "NP" && #express'>
+    Power user: expression in markup, behavior in JS.
+  </div>
+
+  <div id="city-row">City row (structured rules, no parsing).</div>
+  <div id="shipping-note">Shipping note (oneOf + truthy).</div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      var api = window.showmo
+
+      // Simple: no markup expressions needed.
+      api.showmo('#extra', { when: '#country', is: 'NP' })
+
+      // Power user: full expression in markup, custom behavior in JS.
+      api.showmo('.conditional', {
+        attr: 'data-condition',
+        ifTrue: 'show',
+        ifFalse: ['hide', 'disable', 'clear'],
+        onload: true
+      })
+
+      // Structured: selectors, no parsing.
+      api.showmoRules(
+        [
+          { target: '#city-row', when: [{ source: '#country', is: 'NP' }] },
+          {
+            target: '#shipping-note',
+            when: [{ source: '#country', oneOf: ['NP', 'IN'] }, { source: '#express' }]
+          }
+        ],
+        { disableWhenHidden: true }
+      )
+    })
+  </script>
+</body>
+</html>

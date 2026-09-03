@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>showmo — animation presets</title>
+  <link rel="stylesheet" href="../dist/showmo.css" />
+  <script src="../dist/showmo.min.js" defer></script>
+</head>
+<body>
+  <label>Country
+    <select id="country">
+      <option value="US">US</option>
+      <option value="NP">Nepal</option>
+    </select>
+  </label>
+  <label><input type="checkbox" id="newsletter" value="yes" /> Subscribe</label>
+
+  <div data-showmo="#country:NP" data-showmo-animate="fade">
+    Fades in/out on any markup.
+  </div>
+
+  <div data-showmo="#country:NP" data-showmo-animate="slide" style="--showmo-duration:.25s">
+    <div class="showmo-inner">Slides open; needs this one inner wrapper.</div>
+  </div>
+
+  <div data-showmo="#newsletter" data-showmo-animate="pop">
+    Scales + fades; good for cards.
+  </div>
+</body>
+</html>
