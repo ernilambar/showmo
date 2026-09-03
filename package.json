@@ -3,16 +3,13 @@
   "version": "1.0.0",
   "description": "Show it when it matters — safe conditional visibility without eval.",
   "type": "module",
-  "main": "dist/showmo.esm.js",
-  "module": "dist/showmo.esm.js",
-  "unpkg": "dist/showmo.min.js",
-  "jsdelivr": "dist/showmo.min.js",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
   "exports": {
-    ".": {
-      "import": "./dist/showmo.esm.js",
-      "default": "./dist/showmo.esm.js"
-    },
-    "./showmo.css": "./dist/showmo.css",
+    ".": "./src/index.js",
+    "./iife.js": "./src/iife.js",
+    "./showmo.css": "./src/showmo.css",
+    "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
   "files": [
