@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>showmo — JSON rules inline</title>
+  <link rel="stylesheet" href="../dist/showmo.css" />
+  <noscript><style>[data-showmo],[data-showmo-rules]{display:revert !important}</style></noscript>
   <script src="../dist/showmo.min.js" defer></script>
 </head>
 <body>
@@ -24,6 +26,6 @@
   <div data-showmo-rules='[{"source":"#country","oneOf":["NP","IN"]}]' data-showmo-target="#note">
     Shown for Nepal or India.
   </div>
-  <div id="note">Shipping note.</div>
+  <div id="note" hidden>Shipping note.</div>
 </body>
 </html>

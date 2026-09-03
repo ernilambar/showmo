@@ -2,6 +2,11 @@
   --showmo-duration: .2s;
 }
 
+[data-showmo]:not([data-showmo-state]),
+[data-showmo-rules]:not([data-showmo-target]):not([data-showmo-state]) {
+  display: none !important;
+}
+
 .showmo-hidden:not(.showmo-fade):not(.showmo-slide):not(.showmo-pop) {
   display: none !important;
 }

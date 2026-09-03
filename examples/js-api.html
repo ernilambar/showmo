@@ -16,14 +16,14 @@
   </label>
   <label><input type="checkbox" id="express" value="yes" /> Express</label>
 
-  <div id="extra">Simple: no markup expression needed.</div>
+  <div id="extra" hidden>Simple: no markup expression needed.</div>
 
-  <div class="conditional" data-condition='#country === "NP" && #express'>
+  <div class="conditional" data-condition='#country === "NP" && #express' hidden>
     Power user: expression in markup, behavior in JS.
   </div>
 
-  <div id="city-row">City row (structured rules, no parsing).</div>
-  <div id="shipping-note">Shipping note (oneOf + truthy).</div>
+  <div id="city-row" hidden>City row (structured rules, no parsing).</div>
+  <div id="shipping-note" hidden>Shipping note (oneOf + truthy).</div>
 
   <script>
     window.addEventListener('DOMContentLoaded', function () {

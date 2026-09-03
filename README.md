@@ -50,6 +50,31 @@ Full expressions also support `=== !== == != > < >= <=`. Anything else (method c
 
 Precedence: per-element attrs > JS call options > `window.showmoConfig` > defaults.
 
+## No flicker on load
+
+Visibility is applied by JS, so conditional elements can flash visible before the first evaluation. Load `showmo.css` in `<head>` — it pre-hides `[data-showmo]` / `[data-showmo-rules]` elements until the first run sets their state and reveals the matches (instantly — the first run never animates):
+
+```html
+<head>
+  <link rel="stylesheet" href="./dist/showmo.css" />
+  <noscript><style>[data-showmo],[data-showmo-rules]{display:revert !important}</style></noscript>
+</head>
+```
+
+Prefer not to ship the whole file? Inline just the guard:
+
+```html
+<style>[data-showmo]:not([data-showmo-state]),[data-showmo-rules]:not([data-showmo-target]):not([data-showmo-state]){display:none}</style>
+```
+
+Two cases the guard doesn't cover — handle them by pre-hiding with `hidden` (removed automatically on show):
+
+- JS-API targets with no `data-showmo` attributes: `<div id="extra" hidden>…</div>`
+- Rule holders pointing elsewhere (`data-showmo-target`): pre-hide the *target*, not the holder.
+- Custom `attr` names (e.g. `data-condition`): same `hidden` approach.
+
+With `onload: false`, elements stay pre-hidden until you call `refresh()`.
+
 ## JS API
 
 ```js

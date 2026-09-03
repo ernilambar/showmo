@@ -91,9 +91,10 @@ const BUILTINS = {
   show (el) {
     const orig = el.getAttribute('data-showmo-display')
     if (el.style) {
-      if (orig) el.style.display = orig
+      if (orig && orig !== 'none') el.style.display = orig
       else if (el.style.display === 'none') el.style.removeProperty('display')
     }
+    if (el.hasAttribute && el.hasAttribute('hidden')) el.removeAttribute('hidden')
     el.setAttribute('aria-hidden', 'false')
     el.setAttribute(STATE, 'shown')
     if (el.classList) el.classList.remove(HIDDEN_CLS)
@@ -101,7 +102,8 @@ const BUILTINS = {
   hide (el) {
     if (el.style) {
       if (el.getAttribute('data-showmo-display') === null) {
-        el.setAttribute('data-showmo-display', el.style.display || '')
+        const cur = el.style.display
+        el.setAttribute('data-showmo-display', cur && cur !== 'none' ? cur : '')
       }
       el.style.display = 'none'
     }
@@ -172,6 +174,7 @@ export function applyVisibility (el, visible, opts, firstRun) {
       el.classList.toggle(NO_MOTION, firstRun || reducedMotion(opts))
       el.classList.toggle(HIDDEN_CLS, !visible)
     }
+    if (visible && el.hasAttribute && el.hasAttribute('hidden')) el.removeAttribute('hidden')
     el.setAttribute('aria-hidden', visible ? 'false' : 'true')
     el.setAttribute(STATE, visible ? 'shown' : 'hidden')
   } else {

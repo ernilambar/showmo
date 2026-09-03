@@ -126,4 +126,43 @@ describe('effects', () => {
     expect(spy).toHaveBeenCalledTimes(1)
     c.destroy()
   })
+
+  it('pre-hidden (hidden attr) target shows when condition matches', () => {
+    el('<input type="text" id="c" value="NP"><div id="t" hidden>hi</div>')
+    const c = showmo('#t', { when: '#c', is: 'NP' })
+    const t = document.getElementById('t')
+    expect(t.hasAttribute('hidden')).toBe(false)
+    expect(t.getAttribute('data-showmo-state')).toBe('shown')
+    c.destroy()
+  })
+
+  it('pre-hidden (hidden attr) target stays hidden when condition misses', () => {
+    el('<input type="text" id="c" value="US"><div id="t" hidden>hi</div>')
+    const c = showmo('#t', { when: '#c', is: 'NP' })
+    const t = document.getElementById('t')
+    expect(t.getAttribute('data-showmo-state')).toBe('hidden')
+    expect(t.style.display).toBe('none')
+    c.destroy()
+  })
+
+  it('hidden attr removed on show with animate preset', () => {
+    el('<input type="text" id="c" value="NP"><div id="t" hidden>hi</div>')
+    const c = showmo('#t', { when: '#c', is: 'NP', animate: 'fade' })
+    const t = document.getElementById('t')
+    expect(t.hasAttribute('hidden')).toBe(false)
+    expect(t.getAttribute('data-showmo-state')).toBe('shown')
+    c.destroy()
+  })
+
+  it('hide of style="display:none" target restores to visible on show', () => {
+    el('<input type="text" id="c" value="US"><div id="t" style="display:none">hi</div>')
+    const c = showmo('#t', { when: '#c', is: 'NP' })
+    expect(document.getElementById('t').style.display).toBe('none')
+    document.getElementById('c').value = 'NP'
+    document.getElementById('c').dispatchEvent(new Event('change', { bubbles: true }))
+    const t = document.getElementById('t')
+    expect(t.style.display).not.toBe('none')
+    expect(t.getAttribute('data-showmo-state')).toBe('shown')
+    c.destroy()
+  })
 })
