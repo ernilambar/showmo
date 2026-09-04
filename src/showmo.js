@@ -13,6 +13,7 @@ const DEFAULTS = {
   animate: false,
   respectReducedMotion: true,
   refreshOnShow: false,
+  observe: false,
   ifTrue: undefined,
   ifFalse: undefined,
   onShow: undefined,
@@ -188,9 +189,18 @@ function ruleItems (rules, base) {
   return items
 }
 
+const MAX_PASSES = 10
+
+function addedOrRemoved (records) {
+  for (const rec of records) {
+    if (rec.addedNodes.length || rec.removedNodes.length) return true
+  }
+  return false
+}
+
 function createController (items, base, rescan) {
   const doc = docOf()
-  const st = { evaluating: false, dirty: false, destroyed: false }
+  const st = { evaluating: false, dirty: false, destroyed: false, warned: false }
   const hiddenSel = '[data-showmo-state="hidden"],[hidden]'
 
   function lookup (src) {
@@ -234,11 +244,19 @@ function createController (items, base, rescan) {
     st.evaluating = true
     try {
       let first = !!firstAll
-      for (let i = 0; i < 10; i++) {
+      let settled = false
+      for (let i = 0; i < MAX_PASSES; i++) {
         st.dirty = false
         const changed = pass(first)
         first = false
-        if (!st.dirty && !changed) break
+        if (!st.dirty && !changed) {
+          settled = true
+          break
+        }
+      }
+      if (!settled && !st.warned) {
+        st.warned = true
+        warnOf(base, 'showmo: conditions did not settle after ' + MAX_PASSES + ' passes - check for circular conditions')
       }
     } finally {
       st.evaluating = false
@@ -254,9 +272,7 @@ function createController (items, base, rescan) {
     doc.addEventListener('input', onEvent)
   }
 
-  if (base.onload !== false) evaluate(true)
-
-  return {
+  const api = {
     refresh () {
       if (st.destroyed) return
       if (typeof rescan === 'function') rescan()
@@ -264,6 +280,7 @@ function createController (items, base, rescan) {
     },
     destroy () {
       st.destroyed = true
+      if (observer) observer.disconnect()
       for (const item of items) {
         if (item.el.hasAttribute(INIT)) item.el.removeAttribute(INIT)
         if (!item.first) resetElement(item.el, item.opts)
@@ -274,6 +291,24 @@ function createController (items, base, rescan) {
       }
     }
   }
+
+  let observer
+  let queued = false
+  if (base.observe && doc && doc.documentElement && typeof MutationObserver === 'function') {
+    observer = new MutationObserver(function (records) {
+      if (st.destroyed || queued || !addedOrRemoved(records)) return
+      queued = true
+      Promise.resolve().then(function () {
+        queued = false
+        api.refresh()
+      })
+    })
+    observer.observe(doc.documentElement, { childList: true, subtree: true })
+  }
+
+  if (base.onload !== false) evaluate(true)
+
+  return api
 }
 
 export function showmo (targets, options) {

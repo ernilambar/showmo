@@ -1,7 +1,7 @@
 {
   "name": "showmo",
   "version": "0.1.0",
-  "description": "Show it when it matters — safe conditional visibility without eval.",
+  "description": "Show it when it matters \u2014 safe conditional visibility without eval.",
   "keywords": [
     "conditional",
     "visibility",
@@ -25,13 +25,18 @@
   ],
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
     "./iife.js": "./dist/showmo.min.js",
     "./showmo.css": "./src/showmo.css",
+    "./dist/*": "./dist/*",
     "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
   "main": "./src/index.js",
+  "types": "./src/index.d.ts",
   "module": "./src/index.js",
   "files": [
     "dist",
@@ -43,7 +48,9 @@
     "build": "vite build && vite build --config vite.iife.config.js && cp src/showmo.css dist/showmo.css",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "test": "vitest run"
+    "lint:types": "tsc --noEmit --strict --lib dom,es2022 src/index.d.ts",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build && npm test"
   },
   "browserslist": [
     "> 1%",
@@ -54,6 +61,7 @@
     "browserslist-to-esbuild": "^2.1.1",
     "jsdom": "^30.0.1",
     "standard": "^17.1.2",
+    "typescript": "^5.9.3",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
   },
@@ -70,6 +78,9 @@
       "describe",
       "expect",
       "it"
+    ],
+    "ignore": [
+      "dist"
     ]
   }
 }

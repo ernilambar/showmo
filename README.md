@@ -7,7 +7,7 @@ Zero-dependency vanilla JS: show/hide DOM elements based on form field values. C
 ## Quick Start
 
 ```bash
-npm install github:ernilambar/showmo
+npm install showmo
 ```
 
 ```html
@@ -36,11 +36,20 @@ initAll();
 
 ## Install
 
-`dist/showmo.esm.js` for bundlers, `dist/showmo.css` for base styling and animation presets. Load the CSS — without it, `[data-showmo]` elements flash visible before JS runs. Zero dependencies.
+Zero dependencies. TypeScript declarations ship with the package.
 
-`dist/` is not committed to the repo — `npm install` builds it automatically. If you cloned the repo or downloaded it as a ZIP instead, run `npm install` (or `npm run build`) yourself first to generate `dist/`.
+**Bundlers** — `import ... from 'showmo'` resolves to the ESM source in `src/`; your bundler compiles it like any other dependency. A pre-bundled `dist/showmo.esm.js` is also published for tooling that would rather not walk the source, reachable as `showmo/dist/showmo.esm.js`.
 
-A pre-bundled `dist/showmo.min.js` for plain `<script>` tag usage (no bundler, no import) is also built, but this is an early-stage convenience and may change or be dropped in a future version — don't build long-term dependencies on it yet.
+**Plain `<script>` tag** — `dist/showmo.min.js` (also `showmo/iife.js`) defines a global `showmo` object and calls `initAll()` on DOM ready. This is an early-stage convenience and may change or be dropped in a future version — don't build long-term dependencies on it yet.
+
+```html
+<link rel="stylesheet" href="./node_modules/showmo/dist/showmo.css" />
+<script src="./node_modules/showmo/dist/showmo.min.js"></script>
+```
+
+**CSS** — load `dist/showmo.css` (or `showmo/showmo.css` from source) for base styling and the animation presets. Without it, `[data-showmo]` elements flash visible before JS runs.
+
+`dist/` is committed to the repo, so a clone or ZIP download is usable as-is. Rebuild it with `npm run build` after changing anything in `src/`.
 
 ## Syntax
 
@@ -102,6 +111,16 @@ showmoRules(
 ```
 
 `ifTrue`/`ifFalse` accept action names (`show hide enable disable clear ignore`), functions, or arrays. `when` entries are ANDed; hidden sources cascade; chains settle via fixpoint. Both APIs return `{ refresh(), destroy() }` — call `refresh()` for dynamically added markup, `destroy()` to stop listening and restore every managed element to its pre-showmo state (visibility, `disabled`, `required`, classes).
+
+Circular conditions that never settle stop after 10 passes and warn once through `warn` (default `console.warn`).
+
+### Dynamic markup
+
+Pass `observe: true` to watch the DOM and pick up added targets automatically — a `MutationObserver` on added/removed nodes, batched into one `refresh()` per microtask. Off by default; call `refresh()` yourself if you'd rather control when re-scans happen.
+
+```js
+showmo('[data-showmo]', { observe: true });
+```
 
 JSON rules also work inline: `<tr data-showmo-rules='[{"source":"#country","is":"NP"}]'>` (own target; `data-showmo-target="#other"` points elsewhere).
 

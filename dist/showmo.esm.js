@@ -265,21 +265,21 @@ function _(e, t) {
 }
 //#endregion
 //#region src/effects.js
-var v = [
+var te = [
 	"fade",
 	"slide",
 	"pop"
-], y = "data-showmo-state", b = "showmo-hidden", x = "showmo-no-motion", S = "input,select,textarea", C = S + ",button";
+], v = "data-showmo-state", y = "showmo-hidden", b = "showmo-no-motion", x = "input,select,textarea", S = x + ",button";
+function C(e) {
+	return te.includes(e);
+}
 function w(e) {
-	return v.includes(e);
+	return !!e && typeof e.animate == "string" && C(e.animate);
 }
 function T(e) {
-	return !!e && typeof e.animate == "string" && w(e.animate);
-}
-function E(e) {
 	return e && e.respectReducedMotion === !1 ? !1 : typeof window < "u" && typeof window.matchMedia == "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
-function D(e, t, n) {
+function E(e, t, n) {
 	e.dispatchEvent(new CustomEvent(t, {
 		bubbles: !0,
 		detail: {
@@ -288,10 +288,10 @@ function D(e, t, n) {
 		}
 	}));
 }
-function O(e) {
-	D(e, "showmo:init", !0);
+function ne(e) {
+	E(e, "showmo:init", !0);
 }
-function k(e) {
+function D(e) {
 	if (typeof e != "string") return;
 	let t = typeof globalThis < "u" ? globalThis : void 0;
 	for (let n of e.split(".")) {
@@ -300,38 +300,38 @@ function k(e) {
 	}
 	return typeof t == "function" ? t : void 0;
 }
-function A(e, t) {
+function O(e, t) {
 	e && typeof e.warn == "function" ? e.warn(t) : typeof console < "u" && console.warn(t);
 }
-function j(e, t, n) {
+function k(e, t, n) {
 	let r = Array.isArray(e) ? e : [e];
 	for (let e of r) {
-		let r = typeof e == "function" ? e : typeof e == "string" ? k(e) : void 0;
+		let r = typeof e == "function" ? e : typeof e == "string" ? D(e) : void 0;
 		if (r) try {
 			r(t);
 		} catch {}
-		else typeof e == "string" && A(n, "showmo: onShow/onHide global not found: " + e);
+		else typeof e == "string" && O(n, "showmo: onShow/onHide global not found: " + e);
 	}
 }
-function M(e, t, n) {
-	D(e, t ? "showmo:show" : "showmo:hide", !1), j(t ? n.onShow : n.onHide, e, n);
+function A(e, t, n) {
+	E(e, t ? "showmo:show" : "showmo:hide", !1), k(t ? n.onShow : n.onHide, e, n);
 	let r = e.getAttribute(t ? "data-showmo-onshow" : "data-showmo-onhide");
-	if (r && j(r, e, n), t && n.refreshOnShow) for (let t of e.querySelectorAll(S)) t.dispatchEvent(new Event("change", { bubbles: !0 }));
+	if (r && k(r, e, n), t && n.refreshOnShow) for (let t of e.querySelectorAll(x)) t.dispatchEvent(new Event("change", { bubbles: !0 }));
 }
-function N(e, t, n) {
+function j(e, t, n) {
 	let r = [];
 	return e.matches && e.matches(n) && r.push(e), r.push(...e.querySelectorAll(t)), r;
 }
-function P(e) {
-	for (let t of N(e, S, S)) t.getAttribute("data-showmo-required") === null && t.setAttribute("data-showmo-required", t.required ? "true" : "false");
+function M(e) {
+	for (let t of j(e, x, x)) t.getAttribute("data-showmo-required") === null && t.setAttribute("data-showmo-required", t.required ? "true" : "false");
 }
-function F(e) {
+function N(e) {
 	e.dispatchEvent(new Event("change", { bubbles: !0 }));
 }
-var I = {
+var P = {
 	show(e) {
 		let t = e.getAttribute("data-showmo-display");
-		e.style && (t && t !== "none" ? e.style.display = t : e.style.display === "none" && e.style.removeProperty("display")), e.hasAttribute && e.hasAttribute("hidden") && e.removeAttribute("hidden"), e.setAttribute("aria-hidden", "false"), e.setAttribute(y, "shown"), e.classList && e.classList.remove(b);
+		e.style && (t && t !== "none" ? e.style.display = t : e.style.display === "none" && e.style.removeProperty("display")), e.hasAttribute && e.hasAttribute("hidden") && e.removeAttribute("hidden"), e.setAttribute("aria-hidden", "false"), e.setAttribute(v, "shown"), e.classList && e.classList.remove(y);
 	},
 	hide(e) {
 		if (e.style) {
@@ -341,49 +341,49 @@ var I = {
 			}
 			e.style.display = "none";
 		}
-		e.setAttribute("aria-hidden", "true"), e.setAttribute(y, "hidden"), e.classList && e.classList.add(b);
+		e.setAttribute("aria-hidden", "true"), e.setAttribute(v, "hidden"), e.classList && e.classList.add(y);
 	},
 	enable(e) {
-		for (let t of N(e, C, C)) t.getAttribute("data-showmo-disabled") !== null && (t.disabled = !1, t.removeAttribute("data-showmo-disabled"));
+		for (let t of j(e, S, S)) t.getAttribute("data-showmo-disabled") !== null && (t.disabled = !1, t.removeAttribute("data-showmo-disabled"));
 	},
 	disable(e) {
-		for (let t of N(e, C, C)) t.disabled || (t.disabled = !0, t.setAttribute("data-showmo-disabled", "true"));
+		for (let t of j(e, S, S)) t.disabled || (t.disabled = !0, t.setAttribute("data-showmo-disabled", "true"));
 	},
 	clear(e) {
-		for (let t of N(e, S, S)) {
+		for (let t of j(e, x, x)) {
 			let e = (t.type || "").toLowerCase();
-			if (e === "checkbox" || e === "radio") t.checked && (t.checked = !1, F(t));
+			if (e === "checkbox" || e === "radio") t.checked && (t.checked = !1, N(t));
 			else if (t.tagName && t.tagName.toLowerCase() === "select" && t.multiple) {
 				let e = !1;
 				for (let n of t.options) n.selected && (n.selected = !1, e = !0);
-				e && F(t);
-			} else t.value !== "" && (t.value = "", F(t));
+				e && N(t);
+			} else t.value !== "" && (t.value = "", N(t));
 		}
 	},
 	ignore() {}
 };
-function te(e, t) {
+function F(e, t) {
 	let n = Array.isArray(e) ? e : [e];
 	for (let e of n) if (typeof e == "function") try {
 		e(t);
 	} catch {}
-	else typeof e == "string" && I[e] && I[e](t);
+	else typeof e == "string" && P[e] && P[e](t);
 }
-function ne(e, t) {
+function re(e, t) {
 	let n = e.getAttribute("data-showmo-display");
-	n !== null && (e.style && (n ? e.style.display = n : e.style.removeProperty("display")), e.removeAttribute("data-showmo-display")), e.removeAttribute("aria-hidden"), e.removeAttribute(y), e.classList && (e.classList.remove(b, x, "showmo-fade", "showmo-slide", "showmo-pop"), t && t.hiddenClass && e.classList.remove(t.hiddenClass)), I.enable(e);
-	for (let t of N(e, S, S)) t.getAttribute("data-showmo-required") !== null && (t.required = t.getAttribute("data-showmo-required") === "true", t.removeAttribute("data-showmo-required"));
+	n !== null && (e.style && (n ? e.style.display = n : e.style.removeProperty("display")), e.removeAttribute("data-showmo-display")), e.removeAttribute("aria-hidden"), e.removeAttribute(v), e.classList && (e.classList.remove(y, b, "showmo-fade", "showmo-slide", "showmo-pop"), t && t.hiddenClass && e.classList.remove(t.hiddenClass)), P.enable(e);
+	for (let t of j(e, x, x)) t.getAttribute("data-showmo-required") !== null && (t.required = t.getAttribute("data-showmo-required") === "true", t.removeAttribute("data-showmo-required"));
 }
-function re(e, t, n, r) {
-	if (T(n) ? (e.classList && (e.classList.add("showmo-" + n.animate), e.classList.toggle(x, r || E(n)), e.classList.toggle(b, !t)), t && e.hasAttribute && e.hasAttribute("hidden") && e.removeAttribute("hidden"), e.setAttribute("aria-hidden", t ? "false" : "true"), e.setAttribute(y, t ? "shown" : "hidden")) : (te(t ? n.ifTrue === void 0 ? ["show"] : n.ifTrue : n.ifFalse === void 0 ? ["hide"] : n.ifFalse, e), e.setAttribute("aria-hidden", t ? "false" : "true"), e.setAttribute(y, t ? "shown" : "hidden"), e.classList && e.classList.toggle(b, !t)), n.hiddenClass && e.classList && e.classList.toggle(n.hiddenClass, !t), n.requireWhenVisible) {
-		P(e);
-		for (let n of N(e, S, S)) n.required = t && n.getAttribute("data-showmo-required") === "true";
+function ie(e, t, n, r) {
+	if (w(n) ? (e.classList && (e.classList.add("showmo-" + n.animate), e.classList.toggle(b, r || T(n)), e.classList.toggle(y, !t)), t && e.hasAttribute && e.hasAttribute("hidden") && e.removeAttribute("hidden"), e.setAttribute("aria-hidden", t ? "false" : "true"), e.setAttribute(v, t ? "shown" : "hidden")) : (F(t ? n.ifTrue === void 0 ? ["show"] : n.ifTrue : n.ifFalse === void 0 ? ["hide"] : n.ifFalse, e), e.setAttribute("aria-hidden", t ? "false" : "true"), e.setAttribute(v, t ? "shown" : "hidden"), e.classList && e.classList.toggle(y, !t)), n.hiddenClass && e.classList && e.classList.toggle(n.hiddenClass, !t), n.requireWhenVisible) {
+		M(e);
+		for (let n of j(e, x, x)) n.required = t && n.getAttribute("data-showmo-required") === "true";
 	}
-	n.disableWhenHidden && I[t ? "enable" : "disable"](e), !t && n.clearWhenHidden && I.clear(e);
+	n.disableWhenHidden && P[t ? "enable" : "disable"](e), !t && n.clearWhenHidden && P.clear(e);
 }
 //#endregion
 //#region src/showmo.js
-var ie = {
+var ae = {
 	attr: "data-showmo",
 	onload: !0,
 	hiddenClass: "",
@@ -393,6 +393,7 @@ var ie = {
 	animate: !1,
 	respectReducedMotion: !0,
 	refreshOnShow: !1,
+	observe: !1,
 	ifTrue: void 0,
 	ifFalse: void 0,
 	onShow: void 0,
@@ -402,12 +403,12 @@ var ie = {
 	is: void 0,
 	isNot: void 0,
 	oneOf: void 0
-}, L = "data-showmo-init";
-function R() {
+}, I = "data-showmo-init";
+function L() {
 	return typeof document < "u" ? document : void 0;
 }
-function z(e) {
-	let t = R();
+function R(e) {
+	let t = L();
 	if (!t) return [];
 	try {
 		return Array.from(t.querySelectorAll(e));
@@ -415,13 +416,13 @@ function z(e) {
 		return [];
 	}
 }
-function B() {
+function z() {
 	return typeof window < "u" && window.showmoConfig ? window.showmoConfig : {};
 }
-function V(e) {
-	let t = R();
+function B(e) {
+	let t = L();
 	if (!e || !t) return [];
-	if (typeof e == "string") return z(e);
+	if (typeof e == "string") return R(e);
 	if (e.nodeType === 1) return [e];
 	if (typeof e.length == "number") try {
 		return Array.from(e).filter(function(e) {
@@ -432,20 +433,20 @@ function V(e) {
 	}
 	return [];
 }
-function H(e, t) {
+function V(e, t) {
 	let n = e.getAttribute(t);
 	if (n === null) return;
 	if (n === "") return !0;
 	let r = n.trim().toLowerCase();
 	return r !== "false" && r !== "0" && r !== "no" && r !== "off";
 }
-function U(e) {
+function H(e) {
 	if (e == null) return;
 	if (typeof e != "string") return !1;
 	let t = e.trim().toLowerCase();
-	if (t !== "") return t === "false" || t === "0" || t === "no" || t === "off" ? !1 : w(t) ? t : !1;
+	if (t !== "") return t === "false" || t === "0" || t === "no" || t === "off" ? !1 : C(t) ? t : !1;
 }
-function W(e) {
+function U(e) {
 	let t = {};
 	for (let n of [
 		["data-showmo-disable", "disableWhenHidden"],
@@ -453,37 +454,37 @@ function W(e) {
 		["data-showmo-require", "requireWhenVisible"],
 		["data-showmo-refresh", "refreshOnShow"]
 	]) {
-		let r = H(e, n[0]);
+		let r = V(e, n[0]);
 		r !== void 0 && (t[n[1]] = r);
 	}
 	let n = e.getAttribute("data-showmo-class");
 	n !== null && (t.hiddenClass = n || "");
 	let r = e.getAttribute("data-showmo-animate");
 	if (r !== null) {
-		let e = U(r);
+		let e = H(r);
 		e !== void 0 && (t.animate = e);
 	}
 	return t;
 }
-function G(e) {
-	let t = Object.assign({}, ie, B(), e), n = U(t.animate);
+function W(e) {
+	let t = Object.assign({}, ae, z(), e), n = H(t.animate);
 	return t.animate = n !== void 0 && n, t;
 }
-function K(e) {
+function G(e) {
 	return e.is === void 0 ? e.isNot === void 0 ? e.oneOf === void 0 ? {} : { oneOf: e.oneOf } : { isNot: e.isNot } : { is: e.is };
 }
-function q(e) {
+function K(e) {
 	return /[()\s:!<>=|&"']/.test(e);
 }
-function J(e) {
+function q(e) {
 	return function(t, n) {
-		A(e, "showmo: bad condition " + JSON.stringify(n) + " - " + t.message);
+		O(e, "showmo: bad condition " + JSON.stringify(n) + " - " + t.message);
 	};
 }
-function Y(e, t) {
+function J(e, t) {
 	return e.map(function(e) {
 		if (e && e.expr !== void 0) {
-			let n = h(e.expr, J(t));
+			let n = h(e.expr, q(t));
 			return function(e) {
 				return n(e);
 			};
@@ -493,9 +494,9 @@ function Y(e, t) {
 		};
 	});
 }
-function ae(e, t) {
-	let n = K(t), r = t.is !== void 0 || t.isNot !== void 0 || t.oneOf !== void 0, i = Y((Array.isArray(e) ? e : [e]).map(function(e) {
-		return typeof e == "string" ? !r && q(e) ? { expr: e } : Object.assign({ source: e }, n) : e;
+function oe(e, t) {
+	let n = G(t), r = t.is !== void 0 || t.isNot !== void 0 || t.oneOf !== void 0, i = J((Array.isArray(e) ? e : [e]).map(function(e) {
+		return typeof e == "string" ? !r && K(e) ? { expr: e } : Object.assign({ source: e }, n) : e;
 	}), t);
 	return function(e) {
 		return i.every(function(t) {
@@ -503,29 +504,29 @@ function ae(e, t) {
 		});
 	};
 }
-function X(e, t, n) {
+function Y(e, t, n) {
 	return {
 		el: e,
 		test: t,
-		opts: Object.assign({}, n, W(e)),
+		opts: Object.assign({}, n, U(e)),
 		last: void 0,
 		first: !0
 	};
 }
-function oe(e, t) {
+function X(e, t) {
 	let n = e.getAttribute(t.attr), r;
-	return r = n != null && String(n).trim() !== "" ? h(n, J(t)) : t.when === void 0 ? function() {
+	return r = n != null && String(n).trim() !== "" ? h(n, q(t)) : t.when === void 0 ? function() {
 		return !0;
-	} : ae(t.when, t), X(e, r, t);
+	} : oe(t.when, t), Y(e, r, t);
 }
 function se(e, t) {
 	let n = [];
 	for (let r of e) {
 		if (!r) continue;
-		let e = V(r.target), i = r.when, a;
+		let e = B(r.target), i = r.when, a;
 		a = typeof i == "string" ? [{ expr: i }] : Array.isArray(i) ? i : i && typeof i == "object" ? [i] : [];
-		let o = Y(a, t);
-		for (let r of e) n.push(X(r, function(e) {
+		let o = J(a, t);
+		for (let r of e) n.push(Y(r, function(e) {
 			return o.every(function(t) {
 				return t(e);
 			});
@@ -533,11 +534,17 @@ function se(e, t) {
 	}
 	return n;
 }
+var ce = 10;
+function le(e) {
+	for (let t of e) if (t.addedNodes.length || t.removedNodes.length) return !0;
+	return !1;
+}
 function Z(e, n, r) {
-	let a = R(), o = {
+	let a = L(), o = {
 		evaluating: !1,
 		dirty: !1,
-		destroyed: !1
+		destroyed: !1,
+		warned: !1
 	};
 	function s(e) {
 		let n = t(e, a);
@@ -554,7 +561,7 @@ function Z(e, n, r) {
 		}
 		for (let r of e) {
 			let e = t || r.first, a = !!r.test(i);
-			(e || a !== r.last) && (re(r.el, a, r.opts, e), e ? O(r.el) : M(r.el, a, r.opts), r.last = a, r.first = !1, n = !0);
+			(e || a !== r.last) && (ie(r.el, a, r.opts, e), e ? ne(r.el) : A(r.el, a, r.opts), r.last = a, r.first = !1, n = !0);
 		}
 		return n;
 	}
@@ -566,12 +573,16 @@ function Z(e, n, r) {
 			}
 			o.evaluating = !0;
 			try {
-				let t = !!e;
-				for (let e = 0; e < 10; e++) {
+				let t = !!e, r = !1;
+				for (let e = 0; e < ce; e++) {
 					o.dirty = !1;
 					let e = c(t);
-					if (t = !1, !o.dirty && !e) break;
+					if (t = !1, !o.dirty && !e) {
+						r = !0;
+						break;
+					}
 				}
+				!r && !o.warned && (o.warned = !0, O(n, "showmo: conditions did not settle after 10 passes - check for circular conditions"));
 			} finally {
 				o.evaluating = !1;
 			}
@@ -580,32 +591,41 @@ function Z(e, n, r) {
 	function u() {
 		l(!1);
 	}
-	return a && (a.addEventListener("change", u), a.addEventListener("input", u)), n.onload !== !1 && l(!0), {
+	a && (a.addEventListener("change", u), a.addEventListener("input", u));
+	let d = {
 		refresh() {
 			o.destroyed || (typeof r == "function" && r(), l(!1));
 		},
 		destroy() {
-			o.destroyed = !0;
-			for (let t of e) t.el.hasAttribute(L) && t.el.removeAttribute(L), t.first || ne(t.el, t.opts);
+			o.destroyed = !0, f && f.disconnect();
+			for (let t of e) t.el.hasAttribute(I) && t.el.removeAttribute(I), t.first || re(t.el, t.opts);
 			a && (a.removeEventListener("change", u), a.removeEventListener("input", u));
 		}
-	};
+	}, f, p = !1;
+	return n.observe && a && a.documentElement && typeof MutationObserver == "function" && (f = new MutationObserver(function(e) {
+		o.destroyed || p || !le(e) || (p = !0, Promise.resolve().then(function() {
+			p = !1, d.refresh();
+		}));
+	}), f.observe(a.documentElement, {
+		childList: !0,
+		subtree: !0
+	})), n.onload !== !1 && l(!0), d;
 }
 function Q(e, t) {
-	let n = G(t), r = /* @__PURE__ */ new WeakSet(), i = [];
+	let n = W(t), r = /* @__PURE__ */ new WeakSet(), i = [];
 	function a(e) {
-		e && e.nodeType === 1 && !r.has(e) && (e.hasAttribute(L) || (r.add(e), i.push(oe(e, n)), e.setAttribute(L, "true")));
+		e && e.nodeType === 1 && !r.has(e) && (e.hasAttribute(I) || (r.add(e), i.push(X(e, n)), e.setAttribute(I, "true")));
 	}
-	V(e).forEach(a);
+	B(e).forEach(a);
 	function o() {
-		typeof e == "string" ? V(e).forEach(a) : z("[" + n.attr + "]:not([data-showmo-init])").forEach(a);
+		typeof e == "string" ? B(e).forEach(a) : R("[" + n.attr + "]:not([data-showmo-init])").forEach(a);
 	}
 	return Z(i, n, o);
 }
 function $(e, t) {
-	let n = G(t), r = Array.isArray(e) ? e : [], i = /* @__PURE__ */ new WeakSet(), a = [];
+	let n = W(t), r = Array.isArray(e) ? e : [], i = /* @__PURE__ */ new WeakSet(), a = [];
 	function o() {
-		for (let e of se(r, n)) i.has(e.el) || (i.add(e.el), a.push(e), e.el.setAttribute(L, "true"));
+		for (let e of se(r, n)) i.has(e.el) || (i.add(e.el), a.push(e), e.el.setAttribute(I, "true"));
 	}
 	o();
 	function s() {
@@ -613,11 +633,11 @@ function $(e, t) {
 	}
 	return Z(a, n, s);
 }
-function ce() {
-	let e = z("[data-showmo]:not([" + L + "])");
+function ue() {
+	let e = R("[data-showmo]:not([" + I + "])");
 	e.length && Q(e, {});
 	let t = [];
-	for (let e of z("[data-showmo-rules]:not([" + L + "])")) {
+	for (let e of R("[data-showmo-rules]:not([" + I + "])")) {
 		let n;
 		try {
 			n = JSON.parse(e.getAttribute("data-showmo-rules"));
@@ -625,7 +645,7 @@ function ce() {
 			n = null;
 		}
 		if (!Array.isArray(n)) {
-			A(B(), "showmo: bad data-showmo-rules JSON"), e.setAttribute(L, "true");
+			O(z(), "showmo: bad data-showmo-rules JSON"), e.setAttribute(I, "true");
 			continue;
 		}
 		let r = e.getAttribute("data-showmo-target");
@@ -637,4 +657,4 @@ function ce() {
 	t.length && $(t, {});
 }
 //#endregion
-export { i as getValue, ce as initAll, p as parseCondition, Q as showmo, $ as showmoRules, m as testCondition };
+export { i as getValue, ue as initAll, p as parseCondition, Q as showmo, $ as showmoRules, m as testCondition };
