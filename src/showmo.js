@@ -1,7 +1,7 @@
 import { getValue, resolveElements } from './values.js'
-import { testCondition } from './parse.js'
+import { compileCondition } from './parse.js'
 import { matchWhen } from './rules.js'
-import { isPreset, applyVisibility, resetElement, emitInit, emitTransition } from './effects.js'
+import { isPreset, applyVisibility, resetElement, emitInit, emitTransition, warnOf } from './effects.js'
 
 const DEFAULTS = {
   attr: 'data-showmo',
@@ -118,6 +118,22 @@ function looksLikeExpr (s) {
   return /[()\s:!<>=|&"']/.test(s)
 }
 
+function parseWarner (opts) {
+  return function (err, expr) {
+    warnOf(opts, 'showmo: bad condition ' + JSON.stringify(expr) + ' - ' + err.message)
+  }
+}
+
+function compileEntries (entries, base) {
+  return entries.map(function (e) {
+    if (e && e.expr !== undefined) {
+      const fn = compileCondition(e.expr, parseWarner(base))
+      return function (get) { return fn(get) }
+    }
+    return function (get) { return matchWhen(e, get) }
+  })
+}
+
 function whenPredicate (spec, top) {
   const check = pickCheck(top)
   const hasCheck = top.is !== undefined || top.isNot !== undefined || top.oneOf !== undefined
@@ -128,11 +144,9 @@ function whenPredicate (spec, top) {
     }
     return item
   })
+  const tests = compileEntries(entries, top)
   return function (get) {
-    return entries.every(function (e) {
-      if (e && e.expr !== undefined) return testCondition(e.expr, get)
-      return matchWhen(e, get)
-    })
+    return tests.every(function (t) { return t(get) })
   }
 }
 
@@ -144,7 +158,7 @@ function stringItem (el, base) {
   const expr = el.getAttribute(base.attr)
   let test
   if (expr !== null && expr !== undefined && String(expr).trim() !== '') {
-    test = function (get) { return testCondition(expr, get) }
+    test = compileCondition(expr, parseWarner(base))
   } else if (base.when !== undefined) {
     test = whenPredicate(base.when, base)
   } else {
@@ -164,37 +178,38 @@ function ruleItems (rules, base) {
     else if (Array.isArray(when)) entries = when
     else if (when && typeof when === 'object') entries = [when]
     else entries = []
+    const tests = compileEntries(entries, base)
     for (const el of list) {
       items.push(makeItem(el, function (get) {
-        return entries.every(function (e) {
-          if (e && e.expr !== undefined) return testCondition(e.expr, get)
-          return matchWhen(e, get)
-        })
+        return tests.every(function (t) { return t(get) })
       }, base))
     }
   }
   return items
 }
 
-function createController (items, base, cascade, rescan) {
+function createController (items, base, rescan) {
   const doc = docOf()
   const st = { evaluating: false, dirty: false, destroyed: false }
+  const hiddenSel = '[data-showmo-state="hidden"],[hidden]'
 
-  function rawGet (src) {
-    return getValue(src, doc)
-  }
-
-  function get (src) {
-    if (!cascade) return rawGet(src)
+  function lookup (src) {
     const els = resolveElements(src, doc)
-    if (els.length > 0 && els.every(function (el) { return el.closest && el.closest('[data-showmo-state="hidden"]') })) {
+    if (els.length > 0 && els.every(function (el) { return el.closest && el.closest(hiddenSel) })) {
       return undefined
     }
-    return rawGet(src)
+    return getValue(src, doc)
   }
 
   function pass (firstAll) {
     let changed = false
+    const cache = new Map()
+    function get (src) {
+      if (cache.has(src)) return cache.get(src)
+      const v = lookup(src)
+      cache.set(src, v)
+      return v
+    }
     for (const item of items) {
       const first = firstAll || item.first
       const visible = !!item.test(get)
@@ -280,7 +295,7 @@ export function showmo (targets, options) {
       query('[' + base.attr + ']:not([' + INIT + '])').forEach(addEl)
     }
   }
-  return createController(items, base, false, rescan)
+  return createController(items, base, rescan)
 }
 
 export function showmoRules (rules, options) {
@@ -300,7 +315,7 @@ export function showmoRules (rules, options) {
   function rescan () {
     addItems()
   }
-  return createController(items, base, true, rescan)
+  return createController(items, base, rescan)
 }
 
 export function initAll () {
@@ -315,7 +330,7 @@ export function initAll () {
       entries = null
     }
     if (!Array.isArray(entries)) {
-      if (typeof console !== 'undefined' && console.warn) console.warn('showmo: bad data-showmo-rules JSON')
+      warnOf(globalConfig(), 'showmo: bad data-showmo-rules JSON')
       el.setAttribute(INIT, 'true')
       continue
     }

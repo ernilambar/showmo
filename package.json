@@ -1,6 +1,6 @@
 {
   "name": "showmo",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Show it when it matters — safe conditional visibility without eval.",
   "keywords": [
     "conditional",

@@ -192,3 +192,21 @@ export function testCondition (input, get) {
     return false
   }
 }
+
+export function compileCondition (input, onError) {
+  if (!input || !String(input).trim()) return function () { return true }
+  let fn
+  try {
+    fn = parseCondition(input)
+  } catch (err) {
+    if (typeof onError === 'function') onError(err, String(input))
+    return function () { return false }
+  }
+  return function (get) {
+    try {
+      return !!fn(get || getValue)
+    } catch (err) {
+      return false
+    }
+  }
+}

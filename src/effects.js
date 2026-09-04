@@ -37,7 +37,7 @@ export function resolveGlobal (dotted) {
   return typeof cur === 'function' ? cur : undefined
 }
 
-function warnOf (opts, msg) {
+export function warnOf (opts, msg) {
   if (opts && typeof opts.warn === 'function') opts.warn(msg)
   else if (typeof console !== 'undefined') console.warn(msg)
 }
