@@ -40,6 +40,5 @@ Thumbs.db
 /build/
 /coverage/
 /deploy/
-/dist/
 /node_modules/
 /vendor/

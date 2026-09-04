@@ -41,7 +41,6 @@
   ],
   "scripts": {
     "build": "vite build && vite build --config vite.iife.config.js && cp src/showmo.css dist/showmo.css",
-    "prepare": "npm run build",
     "lint": "standard",
     "lint:fix": "standard --fix",
     "test": "vitest run"
